@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CSE Roadmap</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#00ff88">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="CSE Roadmap">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#060610;--card:#111128;--border:#22224a;--green:#00ff88;--blue:#4488ff;--orange:#ff8844;--pink:#ff44aa;--yellow:#ffcc00;--text:#e0e0ff;--muted:#6060a0;}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;overflow-x:hidden;}
+body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0.8rem 1rem;background:rgba(6,6,16,0.97);border-bottom:1px solid var(--border);}
+.logo{font-family:'JetBrains Mono',monospace;font-size:1rem;font-weight:700;color:var(--green);}
+.logo span{color:var(--text);}
+.nav-right{display:flex;align-items:center;gap:0.4rem;}
+.nav-tab{padding:0.4rem 0.8rem;border-radius:8px;border:1px solid transparent;background:none;color:var(--muted);cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;font-size:0.78rem;font-weight:600;transition:all 0.2s;}
+.nav-tab.active{background:var(--green);color:var(--bg);}
+.prog-chip{font-family:'JetBrains Mono',monospace;font-size:0.7rem;padding:0.25rem 0.65rem;border-radius:999px;background:rgba(0,255,136,0.1);color:var(--green);border:1px solid rgba(0,255,136,0.2);}
+
+/* PAGES - Full screen, no overflow issues */
+.screen{display:none;min-height:calc(100vh - 56px);overflow-y:auto;-webkit-overflow-scrolling:touch;}
+.screen.active{display:block;animation:fadeUp 0.25s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* ROADMAP SCREEN */
+.roadmap-wrap{padding:1rem;max-width:700px;margin:0 auto;}
+.hero{padding:1.5rem 0 1rem;}
+.hero h1{font-family:'JetBrains Mono',monospace;font-size:clamp(1.4rem,5vw,2.5rem);font-weight:700;line-height:1.2;}
+.hero h1 .g{color:var(--green);}
+.hero h1 .b{color:var(--blue);}
+.hero p{color:var(--muted);margin-top:0.4rem;font-size:0.85rem;}
+.stats-row{display:flex;gap:0.8rem;margin:1rem 0;flex-wrap:wrap;}
+.stat-box{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:0.7rem 1rem;text-align:center;flex:1;min-width:70px;}
+.stat-num{font-family:'JetBrains Mono',monospace;font-size:1.5rem;font-weight:700;color:var(--green);}
+.stat-lbl{font-size:0.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;}
+.prog-bar{margin-bottom:1.2rem;}
+.prog-top{display:flex;justify-content:space-between;font-size:0.73rem;color:var(--muted);margin-bottom:0.4rem;}
+.prog-track{height:5px;background:var(--border);border-radius:999px;overflow:hidden;}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--green),var(--blue));border-radius:999px;transition:width 0.5s;}
+.level-tabs{display:flex;gap:0.4rem;margin-bottom:1rem;flex-wrap:wrap;}
+.ltab{padding:0.32rem 0.9rem;border-radius:999px;border:1.5px solid var(--border);background:none;color:var(--muted);cursor:pointer;font-size:0.76rem;font-weight:600;transition:all 0.2s;font-family:'Plus Jakarta Sans',sans-serif;}
+.ltab.active{background:var(--green);color:var(--bg);border-color:var(--green);}
+.topics-list{display:flex;flex-direction:column;gap:0.8rem;}
+.tcard{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1rem;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:0.9rem;}
+.tcard:active{transform:scale(0.98);}
+.tcard.done{border-color:rgba(0,255,136,0.4);background:rgba(0,255,136,0.03);}
+.tcard-icon{font-size:1.8rem;flex-shrink:0;}
+.tcard-body{flex:1;min-width:0;}
+.tcard-top{display:flex;align-items:center;gap:0.5rem;margin-bottom:0.25rem;}
+.tcard-title{font-size:0.92rem;font-weight:700;color:#fff;}
+.tlevel{font-size:0.58rem;font-family:'JetBrains Mono',monospace;padding:0.12rem 0.45rem;border-radius:4px;font-weight:700;text-transform:uppercase;flex-shrink:0;}
+.lv-beginner{background:rgba(0,255,136,0.12);color:var(--green);}
+.lv-intermediate{background:rgba(68,136,255,0.12);color:var(--blue);}
+.lv-advanced{background:rgba(255,136,68,0.12);color:var(--orange);}
+.tcard-desc{font-size:0.76rem;color:var(--muted);line-height:1.4;}
+.tcard-right{display:flex;flex-direction:column;align-items:flex-end;gap:0.4rem;flex-shrink:0;}
+.tcard-arr{color:var(--green);font-size:1.2rem;}
+.done-dot{width:8px;height:8px;border-radius:50%;background:var(--green);}
+
+/* CHAPTER SCREEN - Full page, proper scroll */
+.chapter-wrap{padding:1rem;max-width:700px;margin:0 auto;padding-bottom:3rem;}
+.ch-back{display:flex;align-items:center;gap:0.5rem;padding:0.6rem 0 1rem;cursor:pointer;color:var(--green);font-size:0.85rem;font-weight:600;background:none;border:none;}
+.ch-back:active{opacity:0.7;}
+.ch-header{margin-bottom:1.5rem;}
+.ch-icon{font-size:2.5rem;margin-bottom:0.4rem;}
+.ch-title-main{font-family:'JetBrains Mono',monospace;font-size:1.3rem;font-weight:700;color:#fff;}
+.ch-subtitle{color:var(--muted);font-size:0.78rem;margin-top:0.2rem;}
+.section{margin-bottom:1.8rem;}
+.section-title{font-size:0.85rem;font-weight:700;color:var(--green);font-family:'JetBrains Mono',monospace;margin-bottom:0.7rem;display:flex;align-items:center;gap:0.4rem;}
+.section-title::before{content:'▶';font-size:0.5rem;}
+.intro-text{font-size:0.87rem;line-height:1.8;color:var(--text);background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1rem;}
+.intro-text strong{color:#fff;}
+.concept-list{list-style:none;}
+.concept-list li{padding:0.6rem 0.8rem;margin-bottom:0.4rem;background:var(--card);border:1px solid var(--border);border-radius:8px;font-size:0.82rem;display:flex;gap:0.6rem;line-height:1.5;}
+.concept-list li::before{content:'→';color:var(--green);flex-shrink:0;font-family:'JetBrains Mono',monospace;margin-top:0.05rem;}
+.code-block{background:#070714;border:1px solid var(--border);border-radius:10px;padding:1rem;overflow-x:auto;-webkit-overflow-scrolling:touch;font-family:'JetBrains Mono',monospace;font-size:0.76rem;line-height:1.7;color:#a0c8ff;}
+.kw{color:var(--pink);}
+.fn{color:var(--yellow);}
+.str{color:var(--green);}
+.cm{color:#445;font-style:italic;}
+.num{color:var(--orange);}
+.quiz-title{font-size:0.9rem;font-weight:700;color:var(--orange);margin-bottom:0.9rem;font-family:'JetBrains Mono',monospace;}
+.quiz-q{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:0.9rem;margin-bottom:0.9rem;}
+.quiz-q-text{font-size:0.85rem;font-weight:600;color:#fff;margin-bottom:0.65rem;}
+.quiz-opts{display:flex;flex-direction:column;gap:0.35rem;}
+.qopt{padding:0.55rem 0.85rem;border-radius:7px;border:1px solid var(--border);background:none;color:var(--text);cursor:pointer;text-align:left;font-family:'Plus Jakarta Sans',sans-serif;font-size:0.82rem;transition:all 0.2s;width:100%;}
+.qopt:active{transform:scale(0.98);}
+.qopt.correct{background:rgba(0,255,136,0.15);border-color:var(--green);color:var(--green);}
+.qopt.wrong{background:rgba(255,68,68,0.1);border-color:#ff4444;color:#ff6666;}
+.ch-footer{display:flex;justify-content:space-between;align-items:center;margin-top:1.5rem;padding-top:1.2rem;border-top:1px solid var(--border);}
+.mark-done-btn{padding:0.7rem 1.5rem;border-radius:10px;border:none;background:var(--green);color:var(--bg);font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;font-size:0.88rem;}
+.mark-done-btn.already{background:var(--card);border:1.5px solid var(--green);color:var(--green);}
+.yt-link{font-size:0.78rem;color:var(--blue);text-decoration:none;}
+
+/* TECH SCREEN */
+.tech-wrap{padding:1rem;max-width:700px;margin:0 auto;}
+.page-title{font-family:'JetBrains Mono',monospace;font-size:1.2rem;font-weight:700;margin-bottom:1rem;}
+.page-title span{color:var(--green);}
+.tech-list{display:flex;flex-direction:column;gap:0.7rem;}
+.tech-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:0.9rem;}
+.tc-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:0.25rem;}
+.tc-name{font-size:0.92rem;font-weight:700;color:#fff;}
+.tc-hot{font-size:0.58rem;padding:0.12rem 0.45rem;border-radius:4px;background:rgba(255,204,0,0.12);color:var(--yellow);}
+.tc-cat{font-size:0.68rem;color:var(--muted);font-family:'JetBrains Mono',monospace;margin-bottom:0.6rem;}
+.tc-bar{height:4px;background:var(--border);border-radius:999px;margin-bottom:0.4rem;}
+.tc-fill{height:100%;border-radius:999px;transition:width 1s ease;}
+.tc-pct{font-size:0.68rem;color:var(--muted);font-family:'JetBrains Mono',monospace;text-align:right;}
+
+::-webkit-scrollbar{width:3px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">CSE<span>.learn</span></div>
+  <div class="nav-right">
+    <span class="prog-chip" id="prog-chip">0/24</span>
+    <button class="nav-tab active" onclick="showScreen('roadmap',this)">📚 Roadmap</button>
+    <button class="nav-tab" onclick="showScreen('tech',this)">⚡ Tech</button>
+  </div>
+</nav>
+
+<!-- ROADMAP SCREEN -->
+<div class="screen active" id="screen-roadmap">
+  <div class="roadmap-wrap">
+    <div class="hero">
+      <h1><span class="g">Beginner</span> to<br><span class="b">Pro</span> CSE</h1>
+      <p>📖 Topic tap karo — poora chapter, code aur quiz!</p>
+    </div>
+    <div class="stats-row">
+      <div class="stat-box"><div class="stat-num" id="s-done">0</div><div class="stat-lbl">Done</div></div>
+      <div class="stat-box"><div class="stat-num" id="s-total">24</div><div class="stat-lbl">Topics</div></div>
+      <div class="stat-box"><div class="stat-num" id="s-pct">0%</div><div class="stat-lbl">Progress</div></div>
+    </div>
+    <div class="prog-bar">
+      <div class="prog-top"><span>Progress</span><span id="prog-lbl">0 / 24</span></div>
+      <div class="prog-track"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+    </div>
+    <div class="level-tabs">
+      <button class="ltab active" onclick="filterLevel('all',this)">All</button>
+      <button class="ltab" onclick="filterLevel('beginner',this)">🟢 Beginner</button>
+      <button class="ltab" onclick="filterLevel('intermediate',this)">🔵 Intermediate</button>
+      <button class="ltab" onclick="filterLevel('advanced',this)">🟠 Advanced</button>
+    </div>
+    <div class="topics-list" id="topics-list"></div>
+  </div>
+</div>
+
+<!-- CHAPTER SCREEN -->
+<div class="screen" id="screen-chapter">
+  <div class="chapter-wrap">
+    <button class="ch-back" onclick="goBack()">← Back to Roadmap</button>
+    <div id="chapter-content"></div>
+  </div>
+</div>
+
+<!-- TECH SCREEN -->
+<div class="screen" id="screen-tech">
+  <div class="tech-wrap">
+    <div class="page-title">⚡ Tech <span>Pulse</span> 2025</div>
+    <div class="tech-list" id="tech-list"></div>
+  </div>
+</div>
+
+<script>
+const topics=[
+{id:1,icon:'💡',title:'Programming Fundamentals',level:'beginner',dur:'4 weeks',desc:'Variables, loops, conditions — building blocks of every program.',
+chapter:{intro:'Programming fundamentals are the <strong>foundation</strong> of everything in CS. Before you write any app, you must understand how a computer thinks step by step.',
+concepts:['Variable — Ek box jo data store karta hai (number, text, true/false)','Data Types — int, float, string, boolean, list','Operators — +, -, *, /, %, ==, !=, &&, ||','Conditions — if, else, elif — code me decisions lena','Loops — for, while — kaam baar baar karna automatically','Functions — Reusable code block with a name','Input/Output — User se input lena, output dikhana'],
+code:`<span class="cm"># Python — basics in action</span>\n<span class="kw">name</span> = <span class="str">"Digambar"</span>\n<span class="kw">age</span> = <span class="num">21</span>\n\n<span class="cm"># Condition</span>\n<span class="kw">if</span> age >= <span class="num">18</span>:\n    <span class="fn">print</span>(<span class="str">"Adult!"</span>)\n<span class="kw">else</span>:\n    <span class="fn">print</span>(<span class="str">"Minor"</span>)\n\n<span class="cm"># Loop</span>\n<span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="num">5</span>):\n    <span class="fn">print</span>(<span class="str">f"Number: {i}"</span>)\n\n<span class="cm"># Function</span>\n<span class="kw">def</span> <span class="fn">greet</span>(name):\n    <span class="kw">return</span> <span class="str">f"Hello, {name}!"</span>\n\n<span class="fn">print</span>(<span class="fn">greet</span>(<span class="str">"Bhai"</span>))`,
+quiz:[{q:'Variable ka kya kaam hai?',opts:['Code run karna','Data store karna','Loop banana','File open karna'],ans:1},{q:'Loop ka use kab karte hain?',opts:['Ek baar print','Same kaam baar baar','Function banana','Variable declare'],ans:1},{q:'if-else kya karta hai?',opts:['Loop chalata hai','Code me decision leta hai','Variable banata hai','Code delete karta hai'],ans:1}]}},
+
+{id:2,icon:'🐍',title:'Python Basics',level:'beginner',dur:'3 weeks',desc:'Most beginner-friendly language. Start here for scripting and AI.',
+chapter:{intro:'Python is the <strong>most popular beginner language</strong> in the world. It reads like English. Web dev, data science, AI, automation — sab Python se hota hai!',
+concepts:['Lists — Ordered collection: [1, 2, 3, "hello"]','Dictionaries — Key-value pairs: {"name": "Raj", "age": 20}','Tuples — Immutable lists: (1, 2, 3)','String methods — .upper(), .split(), .replace()','File handling — open(), read(), write(), close()','Modules — import math, import random, import os','List comprehension — [x*2 for x in range(10)]'],
+code:`<span class="cm"># Python practical</span>\n\n<span class="cm"># List</span>\n<span class="kw">fruits</span> = [<span class="str">"apple"</span>, <span class="str">"mango"</span>, <span class="str">"banana"</span>]\n<span class="kw">fruits</span>.<span class="fn">append</span>(<span class="str">"grape"</span>)\n<span class="fn">print</span>(<span class="kw">fruits</span>[<span class="num">0</span>])  <span class="cm"># apple</span>\n\n<span class="cm"># Dictionary</span>\n<span class="kw">student</span> = {<span class="str">"name"</span>: <span class="str">"Digambar"</span>, <span class="str">"year"</span>: <span class="num">3</span>}\n<span class="fn">print</span>(<span class="kw">student</span>[<span class="str">"name"</span>])\n\n<span class="cm"># Comprehension</span>\n<span class="kw">squares</span> = [x**<span class="num">2</span> <span class="kw">for</span> x <span class="kw">in</span> <span class="fn">range</span>(<span class="num">5</span>)]\n<span class="fn">print</span>(<span class="kw">squares</span>)  <span class="cm"># [0,1,4,9,16]</span>`,
+quiz:[{q:'Python me list kaise banate hain?',opts:['list=(1,2,3)','list={1,2,3}','list=[1,2,3]','list=<1,2,3>'],ans:2},{q:'Dictionary me data kaise store hota hai?',opts:['Index se','Key-Value pair se','Loop se','Random se'],ans:1},{q:'import kab use karte hain?',opts:['Loop ke liye','Bahari module use karne ke liye','Variable ke liye','Print ke liye'],ans:1}]}},
+
+{id:3,icon:'🌐',title:'HTML & CSS',level:'beginner',dur:'2 weeks',desc:'Build your first web pages. Structure with HTML, style with CSS.',
+chapter:{intro:'HTML aur CSS web development ki <strong>pehli seedhi</strong> hain. HTML page ka structure banata hai, CSS usse sundar banata hai. Har website inhi se bani hoti hai!',
+concepts:['HTML tags — h1, p, div, img, a, button, form','HTML structure — html > head > body','CSS selectors — element, .class, #id','Box model — margin, padding, border, content','Flexbox — display:flex for layouts','Colors — hex (#ff0000), rgb(), named colors','Responsive — @media queries for mobile'],
+code:`<span class="cm">&lt;!-- HTML + CSS --&gt;</span>\n<span class="kw">&lt;style&gt;</span>\n  <span class="fn">.card</span> {\n    <span class="kw">background</span>: <span class="str">#1a1a2e</span>;\n    <span class="kw">padding</span>: <span class="num">20px</span>;\n    <span class="kw">border-radius</span>: <span class="num">12px</span>;\n    <span class="kw">color</span>: <span class="str">white</span>;\n  }\n  <span class="fn">h1</span> { <span class="kw">color</span>: <span class="str">#00ff88</span>; }\n<span class="kw">&lt;/style&gt;</span>\n\n<span class="kw">&lt;div</span> class=<span class="str">"card"</span><span class="kw">&gt;</span>\n  <span class="kw">&lt;h1&gt;</span>Hello World! 🎉<span class="kw">&lt;/h1&gt;</span>\n  <span class="kw">&lt;p&gt;</span>Mera pehla webpage<span class="kw">&lt;/p&gt;</span>\n  <span class="kw">&lt;button&gt;</span>Click Me<span class="kw">&lt;/button&gt;</span>\n<span class="kw">&lt;/div&gt;</span>`,
+quiz:[{q:'HTML me heading kaise likhte hain?',opts:['<heading>','<h1>','<title>','<head>'],ans:1},{q:'CSS me class selector?',opts:['#classname','.classname','@classname','*classname'],ans:1},{q:'Flexbox kab use karte hain?',opts:['Color change','Layout banana','Font size','Image add'],ans:1}]}},
+
+{id:4,icon:'⚡',title:'JavaScript Basics',level:'beginner',dur:'4 weeks',desc:'Make web pages interactive. Core of all modern web development.',
+chapter:{intro:'JavaScript web ka <strong>ek maatra programming language</strong> hai jo browser me chalti hai. Buttons, animations, forms, games — sab JS se hote hain!',
+concepts:['DOM manipulation — getElementById(), querySelector()','Events — onclick, onchange, addEventListener()','Arrow functions — const fn = () => {}','Promises & async/await — asynchronous operations','fetch() — Internet se data lana (APIs)','localStorage — Browser me data save karna','ES6+ — let, const, template literals, destructuring'],
+code:`<span class="cm">// JavaScript basics</span>\n\n<span class="cm">// DOM</span>\n<span class="kw">const</span> btn = document.<span class="fn">querySelector</span>(<span class="str">"#btn"</span>);\nbtn.<span class="fn">addEventListener</span>(<span class="str">"click"</span>, () => {\n  <span class="fn">alert</span>(<span class="str">"Clicked! 🎉"</span>);\n});\n\n<span class="cm">// Fetch API</span>\n<span class="kw">async function</span> <span class="fn">getData</span>() {\n  <span class="kw">const</span> res = <span class="kw">await</span> <span class="fn">fetch</span>(\n    <span class="str">"https://api.github.com/users/torvalds"</span>);\n  <span class="kw">const</span> data = <span class="kw">await</span> res.<span class="fn">json</span>();\n  <span class="fn">console</span>.<span class="fn">log</span>(data.name);\n}\n\n<span class="cm">// localStorage</span>\nlocalStorage.<span class="fn">setItem</span>(<span class="str">"user"</span>, <span class="str">"Digambar"</span>);`,
+quiz:[{q:'JS kahan run hota hai?',opts:['Server pe','Database me','Browser me','OS me'],ans:2},{q:'DOM kya hai?',opts:['Database','HTML ka object','CSS framework','JS library'],ans:1},{q:'async/await kab use?',opts:['Loop ke liye','Async operations ke liye','CSS ke liye','HTML ke liye'],ans:1}]}},
+
+{id:5,icon:'🗄️',title:'Databases & SQL',level:'beginner',dur:'3 weeks',desc:'Store and query data. Essential for any backend.',
+chapter:{intro:'Database ek <strong>organized data store</strong> hai. SQL se hum data save, retrieve, update aur delete karte hain. Har app ka data kisi na kisi database me hota hai!',
+concepts:['Table — Data rows aur columns me','SELECT — Data retrieve karna','INSERT — Naya data add karna','UPDATE — Existing data change karna','DELETE — Data remove karna','WHERE — Filter condition lagana','JOIN — Multiple tables combine karna'],
+code:`<span class="cm">-- SQL basics</span>\n\n<span class="kw">CREATE TABLE</span> students (\n  id <span class="kw">INT PRIMARY KEY</span>,\n  name <span class="kw">VARCHAR</span>(<span class="num">100</span>),\n  year <span class="kw">INT</span>\n);\n\n<span class="kw">INSERT INTO</span> students\n<span class="kw">VALUES</span> (<span class="num">1</span>, <span class="str">'Digambar'</span>, <span class="num">3</span>);\n\n<span class="kw">SELECT</span> * <span class="kw">FROM</span> students;\n\n<span class="kw">SELECT</span> name <span class="kw">FROM</span> students\n<span class="kw">WHERE</span> year = <span class="num">3</span>;\n\n<span class="kw">UPDATE</span> students\n<span class="kw">SET</span> year = <span class="num">4</span>\n<span class="kw">WHERE</span> name = <span class="str">'Digambar'</span>;`,
+quiz:[{q:'Data retrieve karne ke liye?',opts:['INSERT','UPDATE','SELECT','DELETE'],ans:2},{q:'WHERE kab use karte hain?',opts:['Table banane','Filter ke liye','Data insert','Table delete'],ans:1},{q:'PRIMARY KEY kya hai?',opts:['Password','Unique row identifier','Column naam','Table naam'],ans:1}]}},
+
+{id:6,icon:'🔢',title:'Data Structures',level:'intermediate',dur:'8 weeks',desc:'Arrays, linked lists, stacks, queues, trees — master DSA.',
+chapter:{intro:'Data Structures batati hain <strong>data memory me kaise organize karein</strong>. Sahi DS chunne se program fast banta hai. Interviews ka sabse important topic!',
+concepts:['Array — Fixed size, O(1) index access','Linked List — Dynamic size, pointer chain','Stack — LIFO — Last In First Out','Queue — FIFO — First In First Out','Tree — Hierarchical, root-parent-child','BST — Binary Search Tree: Left < Root < Right','Hash Map — Key-value, O(1) average lookup'],
+code:`<span class="cm"># DSA in Python</span>\n\n<span class="cm"># Stack</span>\n<span class="kw">stack</span> = []\n<span class="kw">stack</span>.<span class="fn">append</span>(<span class="num">1</span>)  <span class="cm"># push</span>\n<span class="kw">stack</span>.<span class="fn">append</span>(<span class="num">2</span>)\n<span class="kw">stack</span>.<span class="fn">pop</span>()       <span class="cm"># pop → 2</span>\n\n<span class="cm"># Queue</span>\n<span class="kw">from</span> collections <span class="kw">import</span> deque\n<span class="kw">q</span> = <span class="fn">deque</span>([<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>])\n<span class="kw">q</span>.<span class="fn">popleft</span>()  <span class="cm"># → 1</span>\n\n<span class="cm"># Hash Map — word frequency</span>\n<span class="kw">freq</span> = {}\n<span class="kw">for</span> ch <span class="kw">in</span> <span class="str">"hello"</span>:\n    <span class="kw">freq</span>[ch] = <span class="kw">freq</span>.<span class="fn">get</span>(ch,<span class="num">0</span>) + <span class="num">1</span>\n<span class="fn">print</span>(<span class="kw">freq</span>)  <span class="cm"># {'h':1,'e':1,'l':2,'o':1}</span>`,
+quiz:[{q:'Stack ka principle?',opts:['FIFO','LIFO','Random','Sorted'],ans:1},{q:'Hash Map lookup complexity?',opts:['O(n)','O(log n)','O(1) average','O(n²)'],ans:2},{q:'BST me left child?',opts:['Root se bada','Root se chota','Root ke barabar','Random'],ans:1}]}},
+
+{id:7,icon:'🧠',title:'Algorithms',level:'intermediate',dur:'8 weeks',desc:'Sorting, searching, DP — think like an engineer.',
+chapter:{intro:'Algorithms are <strong>step-by-step solutions</strong> to problems. Big O notation se speed measure karte hain. Interviews me sabse zyada ye hi puchha jaata hai!',
+concepts:['Big O — O(1), O(log n), O(n), O(n log n), O(n²)','Binary Search — O(log n) sorted array search','Bubble Sort — O(n²) simple but slow','Merge Sort — O(n log n) divide and conquer','Recursion — Function jo khud ko call kare','Dynamic Programming — Cache subproblems','Two Pointer & Sliding Window — Array tricks'],
+code:`<span class="cm"># Binary Search O(log n)</span>\n<span class="kw">def</span> <span class="fn">binary_search</span>(arr, target):\n    l, r = <span class="num">0</span>, <span class="fn">len</span>(arr)-<span class="num">1</span>\n    <span class="kw">while</span> l <= r:\n        mid = (l+r)//<span class="num">2</span>\n        <span class="kw">if</span> arr[mid] == target: <span class="kw">return</span> mid\n        <span class="kw">elif</span> arr[mid] < target: l = mid+<span class="num">1</span>\n        <span class="kw">else</span>: r = mid-<span class="num">1</span>\n    <span class="kw">return</span> -<span class="num">1</span>\n\n<span class="cm"># DP — Fibonacci memoized</span>\n<span class="kw">def</span> <span class="fn">fib</span>(n, memo={}):\n    <span class="kw">if</span> n <= <span class="num">1</span>: <span class="kw">return</span> n\n    <span class="kw">if</span> n <span class="kw">not in</span> memo:\n        memo[n] = <span class="fn">fib</span>(n-<span class="num">1</span>) + <span class="fn">fib</span>(n-<span class="num">2</span>)\n    <span class="kw">return</span> memo[n]`,
+quiz:[{q:'Binary search complexity?',opts:['O(n)','O(log n)','O(n²)','O(1)'],ans:1},{q:'DP kab use karte hain?',opts:['Sorting','Overlapping subproblems','File read','UI'],ans:1},{q:'Recursion kya hai?',opts:['Loop','Function jo khud ko call kare','Sort algo','Data structure'],ans:1}]}},
+
+{id:8,icon:'🐙',title:'Git & GitHub',level:'beginner',dur:'1 week',desc:'Version control — tu already use kar raha hai! 😄',
+chapter:{intro:'Git ek <strong>version control system</strong> hai. Tu already GitHub use karta hai — now learn the commands! Ye skill roz kaam aati hai every developer ko.',
+concepts:['git init — Naya repository banana','git add — Changes stage karna','git commit — Changes save with message','git push — GitHub pe upload karna','git pull — Latest code download karna','git branch — Alag feature ke liye branch','git merge — Branch ko main me milana'],
+code:`<span class="cm"># Git daily commands</span>\n\n<span class="cm"># Setup</span>\ngit config --global user.name <span class="str">"Digambar"</span>\ngit config --global user.email <span class="str">"email@gmail.com"</span>\n\n<span class="cm"># Daily workflow</span>\ngit status           <span class="cm"># kya change hua?</span>\ngit add .            <span class="cm"># sab stage karo</span>\ngit commit -m <span class="str">"feat: login page added"</span>\ngit push origin main\n\n<span class="cm"># Clone someone's repo</span>\ngit clone https://github.com/user/repo\n\n<span class="cm"># New branch</span>\ngit checkout -b feature/new-page`,
+quiz:[{q:'git commit kya karta hai?',opts:['Code delete','Changes save karta hai','Upload karta hai','Branch banata hai'],ans:1},{q:'git push kab use?',opts:['Local save','GitHub upload','Branch banana','Code download'],ans:1},{q:'git clone kya karta hai?',opts:['Delete','GitHub se download','Merge','Commit'],ans:1}]}},
+
+{id:9,icon:'⚛️',title:'React.js',level:'intermediate',dur:'6 weeks',desc:'Build modern UIs — most popular frontend library.',
+chapter:{intro:'React JavaScript library hai jo <strong>UI components</strong> banane ke liye use hoti hai. Netflix, Instagram, Facebook sab React use karte hain. 2025 me sabse in-demand frontend skill!',
+concepts:['Component — Reusable UI piece (function)','JSX — HTML + JavaScript mixed syntax','Props — Parent se child ko data','State (useState) — Component ka internal data','useEffect — Side effects (API calls, timers)','Virtual DOM — Fast automatic UI updates','React Router — Multi-page navigation'],
+code:`<span class="cm">// React Counter</span>\n<span class="kw">import</span> { useState } <span class="kw">from</span> <span class="str">'react'</span>;\n\n<span class="kw">function</span> <span class="fn">Counter</span>() {\n  <span class="kw">const</span> [count, setCount] = <span class="fn">useState</span>(<span class="num">0</span>);\n\n  <span class="kw">return</span> (\n    &lt;div&gt;\n      &lt;h1&gt;Count: {count}&lt;/h1&gt;\n      &lt;button\n        onClick={() =&gt; <span class="fn">setCount</span>(count+<span class="num">1</span>)}&gt;\n        +1\n      &lt;/button&gt;\n      &lt;button\n        onClick={() =&gt; <span class="fn">setCount</span>(<span class="num">0</span>)}&gt;\n        Reset\n      &lt;/button&gt;\n    &lt;/div&gt;\n  );\n}\n\n<span class="kw">export default</span> Counter;`,
+quiz:[{q:'useState return karta hai?',opts:['Sirf value','Value + setter function','Component','HTML'],ans:1},{q:'Props kya hain?',opts:['Internal state','Parent se child data','Database','CSS'],ans:1},{q:'JSX kya hai?',opts:['New language','HTML+JS mixed syntax','DB query','CSS preprocessor'],ans:1}]}},
+
+{id:10,icon:'🖥️',title:'Node.js & Express',level:'intermediate',dur:'5 weeks',desc:'Backend with JS. Build REST APIs.',
+chapter:{intro:'Node.js se <strong>JavaScript server pe chalti hai</strong>. Express se REST APIs banana easy hai. Ye duniya ka most popular backend stack hai!',
+concepts:['Node.js — JS runtime outside browser','npm — Package manager, 1M+ libraries','Express.js — Web framework for Node','REST API — GET, POST, PUT, DELETE','Middleware — Request-response ke beech','JSON — Standard data format','.env — Secrets/config store karna'],
+code:`<span class="cm">// Express REST API</span>\n<span class="kw">const</span> express = <span class="fn">require</span>(<span class="str">'express'</span>);\n<span class="kw">const</span> app = <span class="fn">express</span>();\napp.<span class="fn">use</span>(express.<span class="fn">json</span>());\n\n<span class="kw">let</span> students = [\n  {id:<span class="num">1</span>, name:<span class="str">"Digambar"</span>, year:<span class="num">3</span>}\n];\n\n<span class="cm">// GET all students</span>\napp.<span class="fn">get</span>(<span class="str">'/students'</span>, (req,res) =&gt; {\n  res.<span class="fn">json</span>(students);\n});\n\n<span class="cm">// POST — add student</span>\napp.<span class="fn">post</span>(<span class="str">'/students'</span>, (req,res) =&gt; {\n  students.<span class="fn">push</span>(req.body);\n  res.<span class="fn">json</span>({message:<span class="str">"Added!"</span>});\n});\n\napp.<span class="fn">listen</span>(<span class="num">3000</span>);`,
+quiz:[{q:'Node.js kya allow karta hai?',opts:['JS browser me','JS server pe','CSS likhna','DB banana'],ans:1},{q:'DELETE request kab?',opts:['GET','POST','PUT','DELETE'],ans:3},{q:'npm kya hai?',opts:['Node version','Package manager','Database','Framework'],ans:1}]}},
+
+{id:11,icon:'🐳',title:'Docker',level:'intermediate',dur:'3 weeks',desc:'Containerization — works on any machine!',
+chapter:{intro:'Docker se <strong>"Works on my machine" problem khatam</strong>! Ek container banao, kahin bhi chalao — dev, testing, production sab same environment.',
+concepts:['Image — App ka blueprint','Container — Running instance of image','Dockerfile — Image banane ki recipe','docker run — Container start karna','docker-compose — Multiple containers','Volumes — Data persist karna','Port mapping — Container port expose karna'],
+code:`<span class="cm"># Dockerfile</span>\n<span class="kw">FROM</span> node:<span class="num">18</span>\n<span class="kw">WORKDIR</span> /app\n<span class="kw">COPY</span> package*.json ./\n<span class="kw">RUN</span> npm install\n<span class="kw">COPY</span> . .\n<span class="kw">EXPOSE</span> <span class="num">3000</span>\n<span class="kw">CMD</span> [<span class="str">"node"</span>, <span class="str">"index.js"</span>]\n\n<span class="cm"># Build aur run</span>\ndocker build -t myapp .\ndocker run -p <span class="num">3000</span>:<span class="num">3000</span> myapp`,
+quiz:[{q:'Container kya hai?',opts:['VM','Running app instance','Database','CSS'],ans:1},{q:'Dockerfile kya define karta hai?',opts:['CSS','Image steps','DB schema','API routes'],ans:1}]}},
+
+{id:12,icon:'☁️',title:'Cloud Basics (AWS)',level:'intermediate',dur:'6 weeks',desc:'Deploy apps on AWS. EC2, S3, serverless.',
+chapter:{intro:'Cloud = <strong>internet pe computers rent karna</strong>. AWS world ka #1 cloud. Aaj har company cloud use karti hai — ye skill bahut valuable hai!',
+concepts:['EC2 — Virtual server rent karo','S3 — File/image storage (cheap)','RDS — Managed database','Lambda — Serverless (pay per use)','IAM — Users & permissions','CloudFront — Global CDN','Load Balancer — Traffic distribute karna'],
+code:`<span class="cm"># AWS CLI</span>\n\n<span class="cm"># S3 bucket banana</span>\naws s3 mb s3://my-app-bucket\n\n<span class="cm"># File upload</span>\naws s3 cp index.html s3://my-app-bucket/\n\n<span class="cm"># Website hosting enable</span>\naws s3 website s3://my-app-bucket \\\n  --index-document index.html\n\n<span class="cm"># Lambda deploy</span>\naws lambda create-function \\\n  --function-name myFunc \\\n  --runtime nodejs18.x`,
+quiz:[{q:'EC2 kya provide karta hai?',opts:['Database','Virtual server','File storage','CDN'],ans:1},{q:'S3 kab use karte hain?',opts:['Code run','Files store','Database','Load balancing'],ans:1}]}},
+
+{id:13,icon:'🏗️',title:'System Design',level:'advanced',dur:'10 weeks',desc:'Design scalable systems like Netflix or Twitter.',
+chapter:{intro:'System Design me hum <strong>large scale systems architect</strong> karte hain. FAANG interviews ka most important topic. Crores users handle karne wala system kaise design karein!',
+concepts:['Load Balancer — Traffic distribute karna','Cache (Redis) — Fast data access','DB Sharding — Data split karna','Microservices — App = chhoti services','Message Queue (Kafka) — Async communication','CDN — Content users ke paas se serve','Rate Limiting — API abuse rokna'],
+code:`<span class="cm"># Twitter System Design</span>\n\nClient\n  ↓\nCDN (static files)\n  ↓\nLoad Balancer\n  ↓\nAPI Servers (10x)\n  ↓          ↓\nCache      Database\n(Redis)    (Postgres)\n  ↓\nKafka Queue\n  ↓\nNotification Svc\n\n<span class="cm"># Key choices:</span>\n<span class="cm"># Read heavy → Cache</span>\n<span class="cm"># Write heavy → Message queue</span>\n<span class="cm"># Global → CDN + multi-region</span>`,
+quiz:[{q:'Load Balancer ka kaam?',opts:['Data store','Traffic distribute','Cache manage','Code run'],ans:1},{q:'Redis kab use?',opts:['Primary DB','Fast caching','File storage','Load balance'],ans:1}]}},
+
+{id:14,icon:'🤖',title:'Machine Learning',level:'advanced',dur:'8 weeks',desc:'Neural networks, model training — start your AI journey.',
+chapter:{intro:'ML = <strong>computers ko data se seekhna sikhana</strong>. Explicit programming ke bina computer patterns find karta hai. AI ka core yahi hai!',
+concepts:['Supervised — Labeled data se seekhna','Unsupervised — Patterns khud dhundhna','Linear Regression — Numbers predict karna','Classification — Categories predict karna','Neural Networks — Brain inspired model','Train/Test Split — 80/20 rule','scikit-learn — Best Python ML library'],
+code:`<span class="cm"># scikit-learn</span>\n<span class="kw">from</span> sklearn.linear_model <span class="kw">import</span> LinearRegression\n<span class="kw">from</span> sklearn.model_selection <span class="kw">import</span> train_test_split\n<span class="kw">import</span> numpy <span class="kw">as</span> np\n\nX = np.<span class="fn">array</span>([[<span class="num">1</span>],[<span class="num">2</span>],[<span class="num">3</span>],[<span class="num">4</span>],[<span class="num">5</span>]])\ny = np.<span class="fn">array</span>([<span class="num">2</span>,<span class="num">4</span>,<span class="num">6</span>,<span class="num">8</span>,<span class="num">10</span>])\n\nX_tr, X_te, y_tr, y_te = <span class="fn">train_test_split</span>(\n    X, y, test_size=<span class="num">0.2</span>)\n\nmodel = <span class="fn">LinearRegression</span>()\nmodel.<span class="fn">fit</span>(X_tr, y_tr)\n<span class="fn">print</span>(model.<span class="fn">predict</span>([[<span class="num">6</span>]]))  <span class="cm"># → 12</span>`,
+quiz:[{q:'Supervised learning me?',opts:['Unlabeled data','Labeled data','No data','Only images'],ans:1},{q:'Overfitting kab?',opts:['Model underfit','Train data memorize','Fast model','Slow model'],ans:1}]}},
+
+{id:15,icon:'🔐',title:'Cybersecurity',level:'intermediate',dur:'4 weeks',desc:'OWASP, SQL injection — build secure apps.',
+chapter:{intro:'Security <strong>har developer ki responsibility</strong> hai. Ek vulnerability se crores leak ho sakta hai. OWASP Top 10 common risks hain jo sabko pata hone chahiye!',
+concepts:['SQL Injection — Malicious SQL se DB attack','XSS — Malicious JS inject karna','HTTPS — Encrypted communication','Hashing — bcrypt se passwords hash karo','Auth vs Authz — Who vs What can do','OWASP Top 10 — Must know vulnerabilities','Rate Limiting — Brute force rokna'],
+code:`<span class="cm"># Security</span>\n\n<span class="cm"># BAD — vulnerable!</span>\nquery = <span class="str">f"SELECT * FROM users WHERE name='{inp}'"</span>\n\n<span class="cm"># GOOD — parameterized</span>\nquery = <span class="str">"SELECT * FROM users WHERE name=?"</span>\ncursor.<span class="fn">execute</span>(query, (inp,))\n\n<span class="cm"># Password hashing</span>\n<span class="kw">import</span> bcrypt\npwd = <span class="str">b"mypassword"</span>\nhashed = bcrypt.<span class="fn">hashpw</span>(pwd, bcrypt.<span class="fn">gensalt</span>())\n\n<span class="cm"># Verify</span>\nbcrypt.<span class="fn">checkpw</span>(pwd, hashed)  <span class="cm"># True</span>`,
+quiz:[{q:'SQL injection kya hai?',opts:['SQL optimize','Malicious SQL attack','DB backup','Query speed'],ans:1},{q:'Password hash kyon?',opts:['Speed','Plain text unsafe','DB size','Login speed'],ans:1}]}},
+
+{id:16,icon:'📱',title:'React Native / Flutter',level:'intermediate',dur:'6 weeks',desc:'Cross-platform mobile apps with one codebase.',
+chapter:{intro:'React Native/Flutter se <strong>ek code se Android + iOS app</strong> banta hai! Alag alag apps banane ki zarurat nahi. Time aur money dono bachte hain!',
+concepts:['React Native — JS se native apps (Facebook)','Flutter — Dart language (Google)','View, Text, Image — Basic components','StyleSheet — Mobile CSS','Navigation — React Navigation','Device APIs — Camera, GPS, Notifications','Build — APK (Android), IPA (iOS)'],
+code:`<span class="cm">// React Native</span>\n<span class="kw">import</span> { View, Text, TouchableOpacity,\n  StyleSheet } <span class="kw">from</span> <span class="str">'react-native'</span>;\n<span class="kw">import</span> { useState } <span class="kw">from</span> <span class="str">'react'</span>;\n\n<span class="kw">export default function</span> <span class="fn">App</span>() {\n  <span class="kw">const</span> [n, setN] = <span class="fn">useState</span>(<span class="num">0</span>);\n  <span class="kw">return</span> (\n    &lt;View style={s.box}&gt;\n      &lt;Text style={s.txt}&gt;{n}&lt;/Text&gt;\n      &lt;TouchableOpacity\n        onPress={() =&gt; <span class="fn">setN</span>(n+<span class="num">1</span>)}&gt;\n        &lt;Text&gt;Tap!&lt;/Text&gt;\n      &lt;/TouchableOpacity&gt;\n    &lt;/View&gt;\n  );\n}\n<span class="kw">const</span> s = StyleSheet.<span class="fn">create</span>({\n  box:{flex:<span class="num">1</span>,alignItems:<span class="str">'center'</span>,\n    justifyContent:<span class="str">'center'</span>},\n  txt:{fontSize:<span class="num">32</span>,color:<span class="str">'#00ff88'</span>}\n});`,
+quiz:[{q:'RN ka advantage?',opts:['Only Android','Android+iOS ek code','Only web','Only iOS'],ans:1},{q:'Flutter language?',opts:['JS','Python','Dart','Swift'],ans:2}]}},
+
+{id:17,icon:'🔗',title:'REST & GraphQL APIs',level:'intermediate',dur:'3 weeks',desc:'Design APIs — backbone of modern software.',
+chapter:{intro:'API se software components <strong>communicate karte hain</strong>. REST sabse common. GraphQL modern flexible alternative. Har developer ko APIs samajhni chahiye!',
+concepts:['REST — GET/POST/PUT/DELETE resources','HTTP Status — 200 OK, 404 Not Found, 500 Error','JSON — Standard data format','JWT — Token based authentication','GraphQL — Query exactly what you need','Swagger — API documentation','Postman — API testing tool'],
+code:`<span class="cm">// REST conventions</span>\n<span class="cm">// GET  /users     → all users</span>\n<span class="cm">// GET  /users/1   → user id=1</span>\n<span class="cm">// POST /users     → new user</span>\n<span class="cm">// PUT  /users/1   → update</span>\n<span class="cm">// DELETE /users/1 → delete</span>\n\n<span class="cm">// JWT</span>\n<span class="kw">const</span> jwt = <span class="fn">require</span>(<span class="str">'jsonwebtoken'</span>);\n\n<span class="kw">const</span> token = jwt.<span class="fn">sign</span>(\n  { userId: <span class="num">1</span> },\n  process.env.SECRET,\n  { expiresIn: <span class="str">'24h'</span> }\n);\n\n<span class="kw">const</span> decoded = jwt.<span class="fn">verify</span>(\n  token, process.env.SECRET);`,
+quiz:[{q:'Create karne ke liye?',opts:['GET','POST','PUT','DELETE'],ans:1},{q:'JWT kab use?',opts:['DB queries','Authentication','File upload','CSS'],ans:1}]}},
+
+{id:18,icon:'🧪',title:'Testing & TDD',level:'intermediate',dur:'3 weeks',desc:'Unit testing, TDD — write code you can trust.',
+chapter:{intro:'Testing ensure karta hai <strong>code expected behavior kare</strong>. TDD me pehle test likhte hain, phir code! Production bugs se bachne ka best tarika.',
+concepts:['Unit Test — Single function test karna','Integration Test — Multiple parts together','E2E Test — Full user journey','Jest — JS testing framework (#1)','pytest — Python testing','Mocking — Fake dependencies banana','Coverage — Kitna % code tested'],
+code:`<span class="cm">// Jest tests</span>\n\n<span class="kw">function</span> <span class="fn">add</span>(a, b) {\n  <span class="kw">return</span> a + b;\n}\n\n<span class="fn">describe</span>(<span class="str">'add'</span>, () =&gt; {\n  <span class="fn">test</span>(<span class="str">'adds numbers'</span>, () =&gt; {\n    <span class="fn">expect</span>(<span class="fn">add</span>(<span class="num">2</span>,<span class="num">3</span>)).<span class="fn">toBe</span>(<span class="num">5</span>);\n  });\n\n  <span class="fn">test</span>(<span class="str">'negatives'</span>, () =&gt; {\n    <span class="fn">expect</span>(<span class="fn">add</span>(-<span class="num">1</span>,<span class="num">1</span>)).<span class="fn">toBe</span>(<span class="num">0</span>);\n  });\n\n  <span class="fn">test</span>(<span class="str">'zeros'</span>, () =&gt; {\n    <span class="fn">expect</span>(<span class="fn">add</span>(<span class="num">0</span>,<span class="num">0</span>)).<span class="fn">toBe</span>(<span class="num">0</span>);\n  });\n});`,
+quiz:[{q:'TDD me pehle kya?',opts:['Code','Database','Test','Docs'],ans:2},{q:'Unit test kya test karta hai?',opts:['Poora app','Single function','Database','Network'],ans:1}]}},
+
+{id:19,icon:'🧬',title:'Generative AI & LLMs',level:'advanced',dur:'8 weeks',desc:'GPT, Claude, LangChain — build AI products.',
+chapter:{intro:'Gen AI ek <strong>revolution hai</strong>! LLMs jaise GPT-4, Claude text generate karte hain, code likhte hain. 2025 me ye sabse in-demand skill hai!',
+concepts:['LLM — Large Language Model (GPT, Claude, Gemini)','Prompt Engineering — Sahi output ke liye instruct karna','API — OpenAI/Anthropic API apne app me use karna','LangChain — LLM apps banana easy karta hai','RAG — Custom data LLM me add karna','Embeddings — Text to vector','Fine-tuning — Specific task ke liye train karna'],
+code:`<span class="cm"># Anthropic Claude API</span>\n<span class="kw">import</span> anthropic\n\nclient = anthropic.<span class="fn">Anthropic</span>()\n\nmsg = client.messages.<span class="fn">create</span>(\n    model=<span class="str">"claude-opus-4-6"</span>,\n    max_tokens=<span class="num">1024</span>,\n    messages=[{\n      <span class="str">"role"</span>: <span class="str">"user"</span>,\n      <span class="str">"content"</span>: <span class="str">"DSA roadmap for beginners"</span>\n    }]\n)\n\n<span class="fn">print</span>(msg.content[<span class="num">0</span>].text)\n\n<span class="cm"># Prompt tips:</span>\n<span class="cm"># Be specific, give examples</span>\n<span class="cm"># Assign role: "You are a..."</span>`,
+quiz:[{q:'Prompt Engineering kya?',opts:['Code likhna','LLM ko instruct karna','DB design','UI banana'],ans:1},{q:'RAG kab use?',opts:['Speed','Custom data add','Backup','CSS'],ans:1}]}},
+
+{id:20,icon:'⚙️',title:'DevOps & CI/CD',level:'advanced',dur:'8 weeks',desc:'GitHub Actions, Kubernetes — automate delivery.',
+chapter:{intro:'DevOps dev aur ops ko <strong>merge karta hai</strong>. CI/CD se code automatically test aur deploy hota hai. Manual kaam khatam!',
+concepts:['CI — Push pe auto test hona','CD — Test pass pe auto deploy','GitHub Actions — Free CI/CD','Kubernetes — Container orchestration','Monitoring — Logs, metrics, alerts','IaC — Terraform, CloudFormation','Blue/Green — Zero downtime deploy'],
+code:`<span class="cm"># .github/workflows/deploy.yml</span>\n\nname: Deploy\n<span class="kw">on</span>:\n  push:\n    branches: [main]\n\n<span class="kw">jobs</span>:\n  deploy:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v3\n      - name: Install\n        run: npm install\n      - name: Test\n        run: npm test\n      - name: Deploy\n        run: |\n          aws s3 sync ./build s3://app\n          echo "Deployed! 🚀"`,
+quiz:[{q:'CI kya karta hai?',opts:['Manual deploy','Auto test on push','DB backup','UI'],ans:1},{q:'K8s kab?',opts:['Single server','Multiple containers','Database','Frontend'],ans:1}]}},
+
+{id:21,icon:'📊',title:'Data Science',level:'advanced',dur:'6 weeks',desc:'Pandas, NumPy — analyze real datasets.',
+chapter:{intro:'Data Science me <strong>real data se insights nikaalte hain</strong>. Python se millions of rows seconds me analyze. Har company data-driven hai!',
+concepts:['NumPy — Fast arrays, numerical computing','Pandas — DataFrames, data manipulation','Matplotlib — Charts aur graphs','Seaborn — Statistical visuals','Data Cleaning — Missing values handle','EDA — Exploratory Data Analysis','Jupyter — Interactive notebook'],
+code:`<span class="cm"># Pandas</span>\n<span class="kw">import</span> pandas <span class="kw">as</span> pd\n<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt\n\ndf = pd.<span class="fn">read_csv</span>(<span class="str">'students.csv'</span>)\n\n<span class="fn">print</span>(df.<span class="fn">head</span>())         <span class="cm"># 5 rows</span>\n<span class="fn">print</span>(df.<span class="fn">describe</span>())    <span class="cm"># stats</span>\n<span class="fn">print</span>(df.<span class="fn">isnull</span>().<span class="fn">sum</span>()) <span class="cm"># nulls</span>\n\n<span class="cm"># Filter CSE students</span>\ncse = df[df[<span class="str">'branch'</span>]==<span class="str">'CSE'</span>]\n\n<span class="cm"># Chart</span>\ndf[<span class="str">'marks'</span>].<span class="fn">hist</span>()\nplt.<span class="fn">title</span>(<span class="str">'Marks Distribution'</span>)\nplt.<span class="fn">show</span>()`,
+quiz:[{q:'Pandas kab?',opts:['Web dev','Data manipulation','Mobile','CSS'],ans:1},{q:'EDA full form?',opts:['Encryption','Exploratory Data Analysis','External DB','Event Driven'],ans:1}]}},
+
+{id:22,icon:'🌊',title:'Microservices',level:'advanced',dur:'10 weeks',desc:'Break monoliths. Kafka, distributed systems.',
+chapter:{intro:'Microservices = <strong>badi app → chhoti independent services</strong>. Netflix, Amazon, Uber sab use karte hain. Scale karna easy hota hai!',
+concepts:['Monolith vs Microservices — Trade-offs','REST/gRPC/Kafka — Communication','Apache Kafka — Message streaming','API Gateway — Single entry point','Service Discovery — Auto find services','Circuit Breaker — Failures rokna','Docker + K8s — Deploy karna'],
+code:`<span class="cm"># E-commerce services</span>\n\nAPI Gateway (:80)\n  ↓\n┌─────────────────────┐\n│ User    Svc (:3001) │→ PostgreSQL\n│ Product Svc (:3002) │→ MongoDB\n│ Order   Svc (:3003) │→ PostgreSQL\n│ Payment Svc (:3004) │→ Stripe\n│ Email   Svc (:3005) │→ SendGrid\n└─────────────────────┘\n      ↕ Kafka\n\n<span class="cm"># Order placed:</span>\n<span class="cm"># → Payment: charge card</span>\n<span class="cm"># → Inventory: reduce stock</span>\n<span class="cm"># → Email: confirmation</span>`,
+quiz:[{q:'Microservices advantage?',opts:['Ek server','Independent scale+deploy','Slow dev','Single DB'],ans:1},{q:'API Gateway kya?',opts:['DB manage','Single entry point','CSS','Images'],ans:1}]}},
+
+{id:23,icon:'🕸️',title:'Computer Networks',level:'intermediate',dur:'4 weeks',desc:'TCP/IP, DNS, HTTP — how internet works.',
+chapter:{intro:'Networks samajhna <strong>har developer ke liye zarori</strong> hai. App slow kyon hai? Connection fail kyon? Network knowledge kaam aata hai!',
+concepts:['IP Address — Network pe unique address','TCP vs UDP — Reliable vs Fast','DNS — Domain → IP convert karna','HTTP/HTTPS — Web protocol','OSI Model — 7 layers','Ports — 80 HTTP, 443 HTTPS, 22 SSH','Latency vs Bandwidth — Speed vs Capacity'],
+code:`<span class="cm"># Python TCP server</span>\n<span class="kw">import</span> socket\n\nserver = socket.<span class="fn">socket</span>(\n  socket.AF_INET,\n  socket.SOCK_STREAM)\nserver.<span class="fn">bind</span>((<span class="str">'localhost'</span>, <span class="num">9999</span>))\nserver.<span class="fn">listen</span>(<span class="num">5</span>)\n\n<span class="fn">print</span>(<span class="str">"Server ready :9999"</span>)\n<span class="kw">while</span> <span class="kw">True</span>:\n    conn, addr = server.<span class="fn">accept</span>()\n    <span class="fn">print</span>(<span class="str">f"Client: {addr}"</span>)\n    conn.<span class="fn">send</span>(<span class="str">b"Hello!"</span>)\n    conn.<span class="fn">close</span>()\n\n<span class="cm"># HTTP format:</span>\n<span class="cm"># GET /index.html HTTP/1.1</span>\n<span class="cm"># Host: www.example.com</span>`,
+quiz:[{q:'DNS kya karta hai?',opts:['Files store','Domain → IP convert','Email bhejta','Code run'],ans:1},{q:'HTTPS better kyon?',opts:['Faster','Encrypted/secure','Free','Naya'],ans:1}]}},
+
+{id:24,icon:'🎯',title:'Open Source',level:'advanced',dur:'Ongoing',desc:'Contribute to real projects. Build GitHub profile.',
+chapter:{intro:'Open Source = <strong>real world experience + strong GitHub</strong>. Recruiters GitHub dekh ke hire karte hain. Tu already GitHub use karta hai — ab contribute karo!',
+concepts:['Fork — Repo copy apne account pe','Issue — Bug ya feature report karna','Pull Request — Code submit karna','Code Review — Others ka code review','Good First Issue — Beginners ke liye','README — Clear documentation','License — MIT, Apache, GPL rules'],
+code:`<span class="cm"># Open Source workflow</span>\n\n<span class="cm"># 1. Repo dhundo</span>\n<span class="cm">#    github.com/explore</span>\n<span class="cm">#    Label: "good first issue"</span>\n\n<span class="cm"># 2. Fork karo (GitHub button)</span>\n\n<span class="cm"># 3. Clone</span>\ngit clone https://github.com/YOU/repo\n\n<span class="cm"># 4. Branch banana</span>\ngit checkout -b fix/button-bug\n\n<span class="cm"># 5. Fix → commit → push</span>\ngit add .\ngit commit -m <span class="str">"fix: button color"</span>\ngit push origin fix/button-bug\n\n<span class="cm"># 6. Pull Request open karo! 🎉</span>`,
+quiz:[{q:'Fork kya karta hai?',opts:['Repo delete','Copy apne account pe','Code run','Branch delete'],ans:1},{q:'PR kab open karte hain?',opts:['Code download','Apna code submit karne','Branch delete','Issue close'],ans:1}]}}
+];
+
+const techs=[
+{name:'Next.js 15',cat:'Frontend Framework',trend:95,hot:true,color:'#00ff88'},
+{name:'Rust',cat:'Systems Language',trend:78,hot:true,color:'#ff8844'},
+{name:'LangChain',cat:'AI Framework',trend:92,hot:true,color:'#ff44aa'},
+{name:'Kubernetes',cat:'DevOps',trend:85,hot:false,color:'#4488ff'},
+{name:'Bun',cat:'JS Runtime',trend:72,hot:true,color:'#ffcc00'},
+{name:'Supabase',cat:'BaaS',trend:83,hot:true,color:'#00ff88'},
+{name:'Tailwind CSS',cat:'CSS Framework',trend:90,hot:false,color:'#4488ff'},
+{name:'PostgreSQL',cat:'Database',trend:88,hot:false,color:'#ff8844'},
+{name:'WebAssembly',cat:'Low-level Web',trend:65,hot:true,color:'#ffcc00'},
+{name:'Astro',cat:'Web Framework',trend:70,hot:false,color:'#00ff88'},
+{name:'tRPC',cat:'Type-safe API',trend:68,hot:false,color:'#ff44aa'},
+{name:'Zig',cat:'Systems Language',trend:55,hot:true,color:'#ff8844'}
+];
+
+let completed=new Set(JSON.parse(localStorage.getItem('cse_v3')||'[]'));
+let currentFilter='all';
+let currentScreen='roadmap';
+
+function renderTopics(){
+  const filtered=currentFilter==='all'?topics:topics.filter(t=>t.level===currentFilter);
+  document.getElementById('topics-list').innerHTML=filtered.map(t=>`
+    <div class="tcard ${completed.has(t.id)?'done':''}" onclick="openChapter(${t.id})">
+      <div class="tcard-icon">${t.icon}</div>
+      <div class="tcard-body">
+        <div class="tcard-top">
+          <div class="tcard-title">${t.title}</div>
+          <span class="tlevel lv-${t.level}">${t.level}</span>
+        </div>
+        <div class="tcard-desc">${t.desc}</div>
+      </div>
+      <div class="tcard-right">
+        <span class="tcard-arr">›</span>
+        ${completed.has(t.id)?'<span class="done-dot"></span>':''}
+      </div>
+    </div>`).join('');
+  updateStats();
+}
+
+function updateStats(){
+  const done=completed.size,total=topics.length,pct=Math.round(done/total*100);
+  document.getElementById('s-done').textContent=done;
+  document.getElementById('s-pct').textContent=pct+'%';
+  document.getElementById('prog-fill').style.width=pct+'%';
+  document.getElementById('prog-lbl').textContent=`${done} / ${total}`;
+  document.getElementById('prog-chip').textContent=`${done}/${total}`;
+}
+
+function filterLevel(level,btn){
+  currentFilter=level;
+  document.querySelectorAll('.ltab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderTopics();
+}
+
+function openChapter(id){
+  const t=topics.find(x=>x.id===id);
+  const c=t.chapter;
+  const isDone=completed.has(id);
+
+  document.getElementById('chapter-content').innerHTML=`
+    <div class="ch-header">
+      <div class="ch-icon">${t.icon}</div>
+      <div class="ch-title-main">${t.title}</div>
+      <div class="ch-subtitle">${t.level} · ⏱ ${t.dur}</div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Introduction</div>
+      <div class="intro-text">${c.intro}</div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Key Concepts</div>
+      <ul class="concept-list">
+        ${c.concepts.map(con=>`<li>${con}</li>`).join('')}
+      </ul>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Code Example</div>
+      <div class="code-block">${c.code}</div>
+    </div>
+
+    <div class="section">
+      <div class="quiz-title">🧪 Quick Quiz!</div>
+      ${c.quiz.map((q,qi)=>`
+        <div class="quiz-q">
+          <div class="quiz-q-text">Q${qi+1}: ${q.q}</div>
+          <div class="quiz-opts">
+            ${q.opts.map((o,oi)=>`
+              <button class="qopt" onclick="checkAns(this,${oi},${q.ans})">${o}</button>
+            `).join('')}
+          </div>
+        </div>`).join('')}
+    </div>
+
+    <div class="ch-footer">
+      <button class="mark-done-btn ${isDone?'already':''}" onclick="toggleDone(${id})">
+        ${isDone?'✓ Completed!':'✅ Mark as Done'}
+      </button>
+      <a class="yt-link" href="https://www.youtube.com/@CodeWithHarry" target="_blank">📺 YouTube →</a>
+    </div>`;
+
+  // Switch to chapter screen
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-chapter').classList.add('active');
+  // Scroll to top
+  document.getElementById('screen-chapter').scrollTop=0;
+  currentScreen='chapter';
+}
+
+function goBack(){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-roadmap').classList.add('active');
+  currentScreen='roadmap';
+}
+
+function checkAns(btn,selected,correct){
+  const opts=btn.parentElement.querySelectorAll('.qopt');
+  opts.forEach(o=>o.disabled=true);
+  if(selected===correct)btn.classList.add('correct');
+  else{btn.classList.add('wrong');opts[correct].classList.add('correct');}
+}
+
+function toggleDone(id){
+  if(completed.has(id))completed.delete(id);else completed.add(id);
+  localStorage.setItem('cse_v3',JSON.stringify([...completed]));
+  renderTopics();
+  const btn=document.querySelector('.mark-done-btn');
+  if(btn){const d=completed.has(id);btn.textContent=d?'✓ Completed!':'✅ Mark as Done';btn.className='mark-done-btn '+(d?'already':'');}
+}
+
+function showScreen(name,btn){
+  if(name==='roadmap'&&currentScreen==='chapter'){goBack();return;}
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('screen-'+name).classList.add('active');
+  btn.classList.add('active');
+  currentScreen=name;
+  if(name==='tech')renderTech();
+}
+
+function renderTech(){
+  document.getElementById('tech-list').innerHTML=techs.map(t=>`
+    <div class="tech-card">
+      <div class="tc-top">
+        <div>
+          <span class="tc-name">${t.name}</span>
+          ${t.hot?'<span class="tc-hot">🔥 Hot</span>':''}
+        </div>
+        <span class="tc-pct">${t.trend}%</span>
+      </div>
+      <div class="tc-cat">${t.cat}</div>
+      <div class="tc-bar">
+        <div class="tc-fill" style="width:0%;background:${t.color}" data-w="${t.trend}%"></div>
+      </div>
+    </div>`).join('');
+  setTimeout(()=>document.querySelectorAll('.tc-fill').forEach(el=>el.style.width=el.dataset.w),100);
+}
+
+// Handle Android back button
+window.addEventListener('popstate',()=>{
+  if(currentScreen==='chapter'){goBack();}
+});
+// Push state for back button
+history.pushState({},'','');
+
+renderTopics();
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+</body>
+</html>
