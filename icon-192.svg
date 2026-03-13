@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192">
+  <rect width="192" height="192" rx="40" fill="#0a0a0f"/>
+  <rect width="192" height="192" rx="40" fill="url(#grad)"/>
+  <defs>
+    <linearGradient id="grad" x1="0" y1="0" x2="192" y2="192" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#00f5a0" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#7c3aed" stop-opacity="0.15"/>
+    </linearGradient>
+  </defs>
+  <!-- Code brackets -->
+  <text x="30" y="115" font-family="monospace" font-size="72" font-weight="bold" fill="#00f5a0">&lt;/&gt;</text>
+  <!-- Dot indicator -->
+  <circle cx="155" cy="45" r="14" fill="#00f5a0"/>
+  <text x="149" y="51" font-family="monospace" font-size="16" font-weight="bold" fill="#0a0a0f">AI</text>
+  <!-- Bottom bar -->
+  <rect x="28" y="138" width="80" height="6" rx="3" fill="#00f5a0" opacity="0.6"/>
+  <rect x="28" y="152" width="50" height="6" rx="3" fill="#7c3aed" opacity="0.6"/>
+</svg>
